@@ -1,4 +1,7 @@
 # aaa MAIN-PyTorch
+
+Multi-scale Attention-aware Inception Network for Image Interpolation
+
 ![](/figs/network.png)
 
 This repository is an official PyTorch implementation of the paper **"Enhanced Deep Residual Networks for Single Image Super-Resolution"** from **CVPRW 2017, 2nd NTIRE**.
