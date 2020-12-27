@@ -1,0 +1,46 @@
+Setting up a new session...
+Namespace(G0=64, RDNconfig='B', RDNkSize=3, act='relu', batch_size=16, betas=(0.9, 0.999), betas2=(0.9, 0.999), chop=False, cpu=False, data_range='1-800/801-810', data_test=['Set5', 'Set14', 'Urban100', 'B100'], data_train=['DIV2K'], debug=False, decay='200', decay2='200', dilation=False, dir_data='../dataset', dir_demo='../test', direct_downsampling=True, epochs=400, epsilon=1e-08, epsilon2=1e-08, ext='sep', extend='.', gamma=0.5, gamma2=0.5, gan_k=1, gaussian_size=7, gclip=0, load='', loops=3, loss='1*MSE', lr=0.0001, lr2=0.0001, model='AIN', momentum=0.9, momentum2=0.9, n_GPUs=4, n_colors=1, n_feats=64, n_resblocks=16, n_resgroups=1, n_threads=16, no_augment=False, onlydraw=False, optimizer='ADAM', optimizer2='ADAM', patch_size=272, pre_train='', precision='single', print_every=100, reduction=16, res_scale=1, reset=False, resume=0, rgb_range=255, save='AIN_272x2', save_gt=False, save_models=False, save_results=True, scale=[2], seed=1, self_ensemble=False, shift_mean=True, sigma=0, sigma_region=16, skip_threshold=100000000.0, split_batch=1, template='AIN', test_every=1000, test_only=False, trainer='trainer', visdom=True, weight_decay=0, weight_decay2=0)
+Making model...
+Preparing loss function:
+1.000 * MSE
+[Epoch 1]	Learning rate: 1.00e-4
+Traceback (most recent call last):
+  File "main.py", line 55, in <module>
+    t.train()
+  File "/home/jjh/SR/MAIN/src/trainer.py", line 53, in train
+    sr = self.model(lr, idx_scale)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/module.py", line 493, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jjh/SR/MAIN/src/model/__init__.py", line 45, in forward
+    return P.data_parallel(self.model, x, range(self.n_GPUs))
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/parallel/data_parallel.py", line 207, in data_parallel
+    outputs = parallel_apply(replicas, inputs, module_kwargs, used_device_ids)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/parallel/parallel_apply.py", line 83, in parallel_apply
+    raise output
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/parallel/parallel_apply.py", line 59, in _worker
+    output = module(*input, **kwargs)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/module.py", line 493, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jjh/SR/MAIN/src/model/ain.py", line 169, in forward
+    res = self.body(x)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/module.py", line 493, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/container.py", line 92, in forward
+    input = module(input)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/module.py", line 493, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jjh/SR/MAIN/src/model/ain.py", line 127, in forward
+    res = self.body(x)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/module.py", line 493, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/container.py", line 92, in forward
+    input = module(input)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/module.py", line 493, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jjh/SR/MAIN/src/model/ain.py", line 105, in forward
+    br2_2 = self.csab2(self.scale2_2(cat1))
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/site-packages/torch/nn/modules/module.py", line 493, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/jjh/SR/MAIN/src/model/ain.py", line 70, in forward
+    att = torch.cat((x_, ca, sa), 1)
+RuntimeError: CUDA out of memory. Tried to allocate 110.00 MiB (GPU 3; 11.91 GiB total capacity; 8.67 GiB already allocated; 11.56 MiB free; 374.04 MiB cached)

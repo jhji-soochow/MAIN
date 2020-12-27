@@ -1,0 +1,28 @@
+Setting up a new session...
+Namespace(G0=64, RDNconfig='B', RDNkSize=3, act='relu', batch_size=16, betas=(0.9, 0.999), betas2=(0.9, 0.999), chop=False, cpu=False, data_range='1-800/801-810', data_test=['Set5', 'Set14', 'Urban100', 'B100'], data_train=['DIV2K'], debug=False, decay='200', decay2='200', dilation=False, dir_data='../dataset', dir_demo='../test', direct_downsampling=False, epochs=400, epsilon=1e-08, epsilon2=1e-08, ext='sep', extend='.', gamma=0.5, gamma2=0.5, gan_k=1, gaussian_size=7, gclip=0, load='', loops=3, loss='1*L1', lr=0.0001, lr2=0.0001, model='MSRN', momentum=0.9, momentum2=0.9, n_GPUs=1, n_colors=3, n_feats=64, n_resblocks=16, n_resgroups=10, n_threads=16, no_augment=False, onlydraw=False, optimizer='ADAM', optimizer2='ADAM', patch_size=96, pre_train='', precision='single', print_every=100, reduction=16, res_scale=1, reset=False, resume=0, rgb_range=255, save='MSRN_96x2', save_gt=False, save_models=False, save_results=True, scale=[2], seed=1, self_ensemble=False, shift_mean=True, sigma=0, sigma_region=16, skip_threshold=100000000.0, split_batch=1, template='MSRN', test_every=1000, test_only=False, trainer='trainer', visdom=True, weight_decay=0, weight_decay2=0)
+Making model...
+Preparing loss function:
+1.000 * L1
+[Epoch 1]	Learning rate: 1.00e-4
+> /home/jjh/SR/MAIN/src/trainer.py(47)train()
+-> lr, hr = self.prepare(lr, hr)
+(Pdb) Traceback (most recent call last):
+  File "main.py", line 55, in <module>
+    t.train()
+  File "/home/jjh/SR/MAIN/src/trainer.py", line 47, in train
+    lr, hr = self.prepare(lr, hr)
+  File "/home/jjh/SR/MAIN/src/trainer.py", line 47, in train
+    lr, hr = self.prepare(lr, hr)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/bdb.py", line 88, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/bdb.py", line 112, in dispatch_line
+    self.user_line(frame)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/pdb.py", line 259, in user_line
+    self.interaction(frame, None)
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/pdb.py", line 350, in interaction
+    self._cmdloop()
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/pdb.py", line 319, in _cmdloop
+    self.cmdloop()
+  File "/home/jjh/anaconda3/envs/pytorch-11/lib/python3.7/cmd.py", line 126, in cmdloop
+    line = input(self.prompt)
+OSError: [Errno 9] Bad file descriptor
