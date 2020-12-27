@@ -1,0 +1,11 @@
+python: can't open file 'visdom.server': [Errno 2] No such file or directory
+Setting up a new session...
+Namespace(G0=64, RDNconfig='B', RDNkSize=3, act='relu', batch_size=16, betas=(0.9, 0.999), chop=False, cpu=False, data_range='1-100/801-810', data_test=['Set5', 'Set14', 'Urban100'], data_train=['DIV2K'], debug=False, decay='200', dilation=False, dir_data='../dataset', dir_demo='../test', epochs=200, epsilon=1e-08, ext='sep', extend='.', gamma=0.5, gan_k=1, gaussian_size=7, gclip=0, load='', loops=3, loss='1*L1+0*DoGLoss_hig+0*DoGLoss_low+0*HC', lr=0.0001, model='DoGMSRNV4', modulate_rate=16, momentum=0.9, n_GPUs=1, n_colors=3, n_feats=64, n_resblocks=16, n_resgroups=10, n_threads=16, no_augment=False, onlydraw=False, optimizer='ADAM', patch_size=96, pre_train='', precision='single', print_every=10, reduction=16, res_scale=1, reset=True, resume=0, rgb_range=255, save='DoGMSRN_BIX2_P48_v4', save_gt=False, save_models=False, save_results=True, scale=[2], seed=1, self_ensemble=False, shift_mean=True, sigma_region=8, skip_threshold=100000000.0, split_batch=1, template='DoGMSRNV4', test_every=200, test_only=False, visdom=True, weight_decay=0)
+Making model...
+Preparing loss function:
+1.000 * L1
+0.000 * DoGLoss_hig
+0.000 * DoGLoss_low
+-0.000 * HC
+[Epoch 1]	Learning rate: 1.00e-4
+./run.sh: line 61:  5468 Killed                  CUDA_VISIBLE_DEVICES=3 python main.py --template DoGMSRNV4 --data_train DIV2K --data_range 1-100/801-810 --batch_size=16 --loss 1*L1+0*DoGLoss_hig+0*DoGLoss_low+0*HC --data_test Set5+Set14+Urban100 --epochs 200 --print_every 10 --test_every 200 --n_threads 16 --save DoGMSRN_BIX2_P48_v4 --scale 2 --save_results --visdom --patch_size 96 --ext sep --reset
