@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
+# add my benchmark
 class Benchmark(srdata.SRData):
     def __init__(self, args, name='', train=True, benchmark=True):
         super(Benchmark, self).__init__(
