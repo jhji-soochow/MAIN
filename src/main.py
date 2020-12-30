@@ -37,21 +37,14 @@ else:
     logger_test = None
     vis = None
 
+if checkpoint.ok:
+    loader = data.Data(args)
+    model = model.Model(args, checkpoint) # call the Model function that defined in model.__init__
+    loss = loss.Loss(args, checkpoint) if not args.test_only else None
+    t = Trainer(args, loader, model, loss, checkpoint, logger_test, vis)
+    while not t.terminate():
+        t.train()
+        t.test()
 
-if args.data_test == 'video':
-    from videotester import VideoTester
-    model = model.Model(args, checkpoint)
-    t = VideoTester(args, model, checkpoint)
-    t.test()
-else:
-    if checkpoint.ok:
-        loader = data.Data(args)
-        model = model.Model(args, checkpoint) # call the Model function that defined in model.__init__
-        loss = loss.Loss(args, checkpoint) if not args.test_only else None
-        t = Trainer(args, loader, model, loss, checkpoint, logger_test, vis)
-        while not t.terminate():
-            t.train()
-            t.test()
-
-        checkpoint.done()
+    checkpoint.done()
 
