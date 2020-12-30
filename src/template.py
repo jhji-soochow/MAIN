@@ -17,9 +17,6 @@ def set_template(args):
         args.patch_size = 48
         args.epochs = 650
 
-    if args.template.find('RDN') >= 0:
-        args.model = 'RDN'
-
     if args.template.find('DDBPN') >= 0:
         args.model = 'DDBPN'
         args.patch_size = 128

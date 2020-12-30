@@ -49,7 +49,6 @@ class Trainer():
             timer_model.tic()
 
             self.optimizer.zero_grad()
-            # pdb.set_trace()
             sr = self.model(lr, idx_scale)
             loss = self.loss(sr, hr)
             loss.backward()

@@ -30,13 +30,12 @@ We provide scripts for reproducing all the results from our paper. You can train
 
 ## Dependencies
 * Python 3.6
-* PyTorch >= 0.4.0
+* PyTorch >= 1.0
 * numpy
 * skimage
 * **imageio**
 * matplotlib
 * tqdm
-* cv2 >= 3.xx (Only if you use video input/output)
 
 **Recent updates**
 
