@@ -86,7 +86,7 @@ class SRData(data.Dataset):
     # Below functions as used to prepare images
     def _scan(self):
         names_hr = sorted(
-            glob.glob(os.path.join(self.dir_hr, '*' + self.ext[0]))
+            glob.glob(os.path.join(self.dir_hr, '*.*'))
         )
         # if no prepared lr images
         if self.dir_lr == None:
