@@ -46,7 +46,7 @@ parser.add_argument('--patch_size', type=int, default=96,
                     help='output patch size')
 parser.add_argument('--rgb_range', type=int, default=255,
                     help='maximum value of RGB')
-parser.add_argument('--n_colors', type=int, default=3,
+parser.add_argument('--n_colors', type=int, default=1,
                     help='number of color channels to use')
 parser.add_argument('--chop', action='store_true',
                     help='enable memory-efficient forward')
@@ -85,17 +85,6 @@ parser.add_argument('--RDNkSize', type=int, default=3,
 parser.add_argument('--RDNconfig', type=str, default='B',
                     help='parameters config of RDN. (Use in RDN)')
 
-# Option for Difference of Gaussian Net (DoGNet)
-parser.add_argument('--loops', type=int, default=3,
-                    help='loops of gaussian filtering')
-parser.add_argument('--gaussian_size', type=int, default=7,
-                    help='size of gaussian kernel')
-parser.add_argument('--sigma_region', type=int, default=16,
-                    help='the region of sigma  [1, \sigma_region + 1]')
-# parser.add_argument('--modulate_rate', type=int, default=16,
-#                     help='modulate rate')
-parser.add_argument('--sigma', type=float, default=0, 
-                    help='sigma value for dogmsrnv8')
 # Option for Residual channel attention network (RCAN)
 parser.add_argument('--n_resgroups', type=int, default=10,
                     help='number of residual groups')
@@ -139,25 +128,6 @@ parser.add_argument('--epsilon', type=float, default=1e-8,
 parser.add_argument('--weight_decay', type=float, default=0,
                     help='weight decay')
 
-parser.add_argument('--lr2', type=float, default=1e-4,
-                    help='learning rate')
-parser.add_argument('--decay2', type=str, default='200',
-                    help='learning rate decay type')
-parser.add_argument('--gamma2', type=float, default=0.5,
-                    help='learning rate decay factor for step decay')
-parser.add_argument('--optimizer2', default='ADAM',
-                    choices=('SGD', 'ADAM', 'RMSprop'),
-                    help='optimizer to use (SGD | ADAM | RMSprop)')
-parser.add_argument('--momentum2', type=float, default=0.9,
-                    help='SGD momentum')
-parser.add_argument('--betas2', type=tuple, default=(0.9, 0.999),
-                    help='ADAM beta')
-parser.add_argument('--epsilon2', type=float, default=1e-8,
-                    help='ADAM epsilon for numerical stability')
-parser.add_argument('--weight_decay2', type=float, default=0,
-                    help='weight decay')
-
-
 parser.add_argument('--gclip', type=float, default=0,
                     help='gradient clipping threshold (0 = no clipping)')
 
@@ -166,7 +136,7 @@ parser.add_argument('--loss', type=str, default='1*L1',
                     help='loss function configuration')
 parser.add_argument('--skip_threshold', type=float, default='1e8',
                     help='skipping batch that has large error')
-parser.add_argument('--shave', type=int, default=2,
+parser.add_argument('--shave', type=int, default=0,
                     help='shave when compute psnr')
 # Log specifications
 parser.add_argument('--save', type=str, default='test',

@@ -73,6 +73,8 @@ def set_channel(*args, n_channels=3):
         if n_channels == 1 and c == 3:
             # pdb.set_trace()
             img = np.expand_dims(sc.rgb2ycbcr(img)[:, :, 0], 2)
+            # 这可能是个大bug
+            img = np.round(img)
         elif n_channels == 3 and c == 1:
             img = np.concatenate([img] * n_channels, 2)
 

@@ -189,19 +189,23 @@ def calc_psnr(sr, hr, scale, rgb_range, dataset=None):
 
     diff = (sr - hr) / rgb_range
     if dataset and dataset.dataset.benchmark:
-        shave = scale
-        if diff.size(1) > 1: # 先转成Y 然后再求PSNR
+        # shave = scale
+        shave = 0
+        if diff.size(1) > 1: # if RGB, convert to ycbcr first, and then compute PSNR on y channel 
             gray_coeffs = [65.738, 129.057, 25.064]
             convert = diff.new_tensor(gray_coeffs).view(1, 3, 1, 1) / 256 
-            # convert = (diff.new_tensor(gray_coeffs).view(1, 3, 1, 1) + 16) / 256  # 进行了+16的修正
             diff = diff.mul(convert).sum(dim=1)
     else:
         shave = scale + 6
 
-    valid = diff[..., shave:-shave, shave:-shave]
-    mse = valid.pow(2).mean()
+    if shave == 0:
+        valid = diff
+    else:
+        valid = diff[..., shave:-shave, shave:-shave]
 
+    mse = valid.pow(2).mean()
     return -10 * math.log10(mse)
+
 
 def make_optimizer(args, target, alias='optimizer'): # give this optimizer a name.
     '''
@@ -256,19 +260,7 @@ def make_optimizer(args, target, alias='optimizer'): # give this optimizer a nam
         def get_last_epoch(self):
             return self.scheduler.last_epoch
 
-     # 为了训练FSRCNN
-    if args.model == 'FSRCNN':
-        model = target.model
-        
-        trainable = [
-            {'params': model.first_part.parameters()},
-            {'params': model.mid_part.parameters()},
-            {'params': model.last_part.parameters(), 'lr': args.lr * 0.1}]
-    # pdb.set_trace()
     optimizer = CustomOptimizer(alias,trainable, **kwargs_optimizer)
-
-   
-
     optimizer._register_scheduler(scheduler_class, **kwargs_scheduler)
     return optimizer
 
