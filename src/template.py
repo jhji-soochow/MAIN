@@ -58,6 +58,9 @@ def set_template(args):
         args.model = 'AIN'
         args.n_resgroups = 1
         args.n_resblocks = 7
+
+    if args.template.find('AIN2') >=0:
+        args.model = 'AIN2'
     
     if args.template.find('MSRNint') >= 0:
         args.model = 'MSRNint'
