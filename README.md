@@ -6,16 +6,18 @@ This repository is an official PyTorch implementation of the paper **"Multi-scal
 
 If you find our work useful in your research or publication, please cite our work:
 
-[1] Bee Lim, Sanghyun Son, Heewon Kim, Seungjun Nah, and Kyoung Mu Lee, **"Enhanced Deep Residual Networks for Single Image Super-Resolution,"** <i>2nd NTIRE: New Trends in Image Restoration and Enhancement workshop and challenge on image super-resolution in conjunction with **CVPR 2017**. </i> [[PDF](http://openaccess.thecvf.com/content_cvpr_2017_workshops/w12/papers/Lim_Enhanced_Deep_Residual_CVPR_2017_paper.pdf)] [[arXiv](https://arxiv.org/abs/1707.02921)] [[Slide](https://cv.snu.ac.kr/research/EDSR/Presentation_v3(release).pptx)]
-```
-@InProceedings{Lim_2017_CVPR_Workshops,
-  author = {Lim, Bee and Son, Sanghyun and Kim, Heewon and Nah, Seungjun and Lee, Kyoung Mu},
-  title = {Enhanced Deep Residual Networks for Single Image Super-Resolution},
-  booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
-  month = {July},
-  year = {2017}
-}
-```
+[1] J. Ji, B. Zhong and K. -K. Ma, "Image Interpolation Using Multi-Scale Attention-Aware Inception Network," in IEEE Transactions on Image Processing, vol. 29, pp. 9413-9428, 2020, doi: 10.1109/TIP.2020.3026632.
+
+@ARTICLE{9210165,
+  author={J. {Ji} and B. {Zhong} and K. -K. {Ma}},
+  journal={IEEE Transactions on Image Processing}, 
+  title={Image Interpolation Using Multi-Scale Attention-Aware Inception Network}, 
+  year={2020},
+  volume={29},
+  number={},
+  pages={9413-9428},
+  doi={10.1109/TIP.2020.3026632}}
+
 We provide scripts for reproducing all the results from our paper. You can train your own model from scratch, or use pre-trained model to enlarge your images.
 
 **Differences between Torch version**

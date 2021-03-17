@@ -69,7 +69,6 @@ class AFE(nn.Module):
         att = torch.cat((x_, ca, sa), 1)
         res = self.fushion(att)
         res += x
-        #res = self.act(res)
         return res
 
 
@@ -133,8 +132,6 @@ class AIN(nn.Module):
         modules_tail = [
             nn.Conv2d(n_feats * (self.n_blocks + 1), n_feats, 1, padding=0, stride=1),
             conv(n_feats, n_feats, kernel_size),
-            # common.Upsampler(conv, kernel_size, scale, n_feats, act=False),
-            # conv(n_feats, args.n_colors, kernel_size)
             ]
 
         self.head = nn.Sequential(*modules_head)
@@ -144,9 +141,6 @@ class AIN(nn.Module):
         self.tail2 =  common.MyUpsampler(conv, scale, n_feats, act=None)
 
     def forward(self, x):
-        # import pdb; pdb.set_trace()
-        # x = self.sub_mean(x)
-
         x_ = x
         x = self.head(x)
         res = x
@@ -160,7 +154,6 @@ class AIN(nn.Module):
         res = torch.cat(MSRB_out,1)
         res = self.tail(res)
         x = self.tail2(res, x_)
-        # x = self.add_mean(x)
         return x 
 
     def load_state_dict(self, state_dict, strict=False):
