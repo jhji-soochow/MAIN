@@ -1,6 +1,5 @@
 # import random
 import numpy as np
-from skimage.util import random_noise
 import skimage.color as sc
 import pdb
 import torch
@@ -77,7 +76,6 @@ def set_channel(*args, n_channels=3):
             img = np.round(img)
         elif n_channels == 3 and c == 1:
             img = np.concatenate([img] * n_channels, 2)
-
         return img
 
     return [_set_channel(a) for a in args]
@@ -87,16 +85,11 @@ def np2Tensor(*args, rgb_range=255):
         np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))
         tensor = torch.from_numpy(np_transpose).float()
         tensor.mul_(rgb_range / 255)
-
         return tensor
 
     return [_np2Tensor(a) for a in args]
 
 def augment(*args, hflip=True, rot=True):
-    # hflip = hflip and random.random() < 0.5
-    # vflip = rot and random.random() < 0.5
-    # rot90 = rot and random.random() < 0.5
-
     hflip = hflip and np.random.rand() < 0.5
     vflip = rot and np.random.rand() < 0.5
     rot90 = rot and np.random.rand() < 0.5
@@ -105,19 +98,9 @@ def augment(*args, hflip=True, rot=True):
         if hflip: img = img[:, ::-1, :]
         if vflip: img = img[::-1, :, :]
         if rot90: img = img.transpose(1, 0, 2)
-        
         return img
 
     return [_augment(a) for a in args]
-
-
-# TODO: Add noise on test files
-
-# def add_noise(lr, args):
-#     mode = args.noise_mode
-#     mean = args.noise_mean # float
-#     var  = args.noise_var  # float
-#     return random_noise(lr, mode=mode, mean=mean, var=var, seed=1)
     
 
 
