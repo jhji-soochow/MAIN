@@ -1,12 +1,12 @@
 import argparse
 import template
 
-parser = argparse.ArgumentParser(description='MAIN')
+parser = argparse.ArgumentParser(description='AIN')
 
 parser.add_argument('--trainer', default='trainer',
                     help='trainer')                    
 parser.add_argument('--template', default='.',
-                    help='You can set various templates in option.py')
+                    help='Set various templates in option.py')
 
 # Hardware specifications
 parser.add_argument('--n_threads', type=int, default=16,
@@ -35,11 +35,6 @@ parser.add_argument('--scale', type=int, default=2,
                     help='upscale factor')
 parser.add_argument('--direct_downsampling', action='store_true',
                     help='get LR image by direct downsampling')
-
-
-# ------------------------------------------------------ #
-# patchsize = 192
-
 parser.add_argument('--patch_size', type=int, default=96,
                     help='output patch size')
 parser.add_argument('--rgb_range', type=int, default=255,
@@ -59,12 +54,6 @@ parser.add_argument('--pre_train', type=str, default='',
                     help='pre-trained model directory')
 parser.add_argument('--extend', type=str, default='.',
                     help='pre-trained model directory')
-# parser.add_argument('--res_scale', type=float, default=1,
-#                     help='residual scaling')
-# parser.add_argument('--shift_mean', default=True,
-#                     help='subtract pixel mean from the input')
-# parser.add_argument('--dilation', action='store_true',
-#                     help='use dilated convolution')
 parser.add_argument('--precision', type=str, default='single',
                     choices=('single', 'half'),
                     help='FP precision for test (single | half)')
@@ -78,14 +67,8 @@ parser.add_argument('--epochs', type=int, default=300,
                     help='number of epochs to train')
 parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')
-# parser.add_argument('--split_batch', type=int, default=1,
-#                     help='split the batch into smaller chunks')
-# parser.add_argument('--self_ensemble', action='store_true',
-#                     help='use self-ensemble method for test')
 parser.add_argument('--test_only', action='store_true',
                     help='set this option to test the model')
-# parser.add_argument('--gan_k', type=int, default=1,
-#                     help='k value for adversarial loss')
 
 # Optimization specifications
 parser.add_argument('--lr', type=float, default=1e-4,
