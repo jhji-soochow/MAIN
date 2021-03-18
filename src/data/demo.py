@@ -34,6 +34,4 @@ class Demo(data.Dataset):
     def __len__(self):
         return len(self.filelist)
 
-    def set_scale(self, idx_scale):
-        self.idx_scale = idx_scale
 

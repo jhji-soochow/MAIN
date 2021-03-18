@@ -67,28 +67,12 @@ class MAIN(nn.Module):
     def __init__(self, args):
         super(MAIN, self).__init__()
 
-        self.modelnumber = args.modelscale
-
-        self.models = nn.ModuleList([make_model(args) for i in range(self.modelnumber)])
-
+        self.models = nn.ModuleList([make_model(args) for i in range(3)])
         ckpt_dir = '../experiment/AIN'
-
-        # pc_96_MSARN7_epoch400_30.65.pth
-
-        if self.modelnumber == 5:
-            self.state_dicts = [
-                                torch.load(ckpt_dir + '_96x2/'  + 'model/model_latest.pt', map_location='cpu'),
-                                torch.load(ckpt_dir + '_120x2/' + 'model/model_latest.pt', map_location='cpu'),
-                                torch.load(ckpt_dir + '_144x2/' + 'model/model_latest.pt', map_location='cpu'),
-                                torch.load(ckpt_dir + '_168x2/' + 'model/model_latest.pt', map_location='cpu'),
-                                torch.load(ckpt_dir + '_192x2/' + 'model/model_latest.pt', map_location='cpu')]
-
-        if self.modelnumber == 3:
-            self.state_dicts = [
-                                torch.load(ckpt_dir + '_96x2/'  + 'model/model_latest.pt', map_location='cpu'),
-                                torch.load(ckpt_dir + '_136x2/' + 'model/model_latest.pt', map_location='cpu'),
-                                # torch.load(ckpt_dir + '_168x2/' + 'model/model_latest.pt', map_location='cpu'),
-                                torch.load(ckpt_dir + '_192x2/' + 'model/model_latest.pt', map_location='cpu')]
+        self.state_dicts = [
+                            torch.load(ckpt_dir + '_96x2/'  + 'model/model_latest.pt', map_location='cpu'),
+                            torch.load(ckpt_dir + '_136x2/' + 'model/model_latest.pt', map_location='cpu'),
+                            torch.load(ckpt_dir + '_192x2/' + 'model/model_latest.pt', map_location='cpu')]
         
 
                             
@@ -158,24 +142,10 @@ def test(args, model=None, use_cuda=True):
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='run MAIN')
 
-    # model init
-    parser.add_argument('--n_resgroups', type=int, default=1,
-                    help='number of residual groups')
-    parser.add_argument('--n_resblocks', type=int, default=7,
-                    help='number of residual blocks')
-    parser.add_argument('--n_feats', type=int, default=64,
-                    help='number of feature maps')
-    parser.add_argument('--reduction', type=int, default=16,
-                    help='number of feature maps reduction')
-    parser.add_argument('--modelscale', type=int, default=3,
-                    help='scale of models')
-
     parser.add_argument('--rgb_range', type=int, default=255,
                     help='maximum value of RGB')
     parser.add_argument('--n_colors', type=int, default=1,
                     help='number of color channels to use')
-    
-    
     parser.add_argument('--testdir', type=str, default='/data/jjh_backup/1_3/testset/Set18',
                     help='dataset directory')
     parser.add_argument('--scale', type=int, default=[2],
@@ -190,9 +160,7 @@ if __name__=="__main__":
 
     ## hyperparameters
     use_cuda = not args.cpu and torch.cuda.is_available()
-
     model = MAIN(args)
-
     test(args, model=model, use_cuda=use_cuda)
 
     

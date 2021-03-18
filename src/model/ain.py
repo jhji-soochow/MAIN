@@ -1,5 +1,4 @@
 from model import common
-# import common
 import torch
 import torch.nn as nn
 
@@ -111,7 +110,7 @@ class AIN(nn.Module):
         super(AIN, self).__init__()
         
         n_feats = 64
-        n_blocks = 7
+        n_blocks = 2
         kernel_size = 3
         scale = args.scale
         act = nn.ReLU(True)
@@ -138,76 +137,43 @@ class AIN(nn.Module):
         self.body = nn.Sequential(*modules_body)
         self.tail = nn.Sequential(*modules_tail)
 
-        self.tail2 =  common.MyUpsampler(conv, scale, n_feats, act=None)
+        self.tail2 =  common.MyUpsampler(conv, scale, n_feats)
 
     def forward(self, x):
         x_ = x
         x = self.head(x)
         res = x
 
-        MSRB_out = []
+        AIB_out = []
         for i in range(self.n_blocks):
             x = self.body[i](x)
-            MSRB_out.append(x)
-        MSRB_out.append(res)
+            AIB_out.append(x)
+        AIB_out.append(res)
 
-        res = torch.cat(MSRB_out,1)
+        res = torch.cat(AIB_out,1)
         res = self.tail(res)
-        x = self.tail2(res, x_)
+        x = self.tail2(res, x_)     # to conduct real interpolation
         return x 
-
-    def load_state_dict(self, state_dict, strict=False):
-        own_state = self.state_dict()
-        for name, param in state_dict.items():
-            if name in own_state:
-                if isinstance(param, nn.Parameter):
-                    param = param.data
-                try:
-                    own_state[name].copy_(param)
-                except Exception:
-                    if name.find('tail') >= 0:
-                        print('Replace pre-trained upsampler to new one...')
-                    else:
-                        raise RuntimeError('While copying the parameter named {}, '
-                                           'whose dimensions in the model are {} and '
-                                           'whose dimensions in the checkpoint are {}.'
-                                           .format(name, own_state[name].size(), param.size()))
-            elif strict:
-                if name.find('tail') == -1:
-                    raise KeyError('unexpected key "{}" in state_dict'
-                                   .format(name))
-
-        if strict:
-            missing = set(own_state.keys()) - set(state_dict.keys())
-            if len(missing) > 0:
-                raise KeyError('missing keys in state_dict: "{}"'.format(missing))
 
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description='MSRN')
-    parser.add_argument('--scale', type=int, default=[2],
+    parser = argparse.ArgumentParser(description='AIN')
+    parser.add_argument('--scale', type=int, default=2,
                         help='super resolution scale')
     parser.add_argument('--n_colors', type=int, default=3,
                         help='n colors of input')
-    parser.add_argument('--rgb_range', type=float, default=255,
-                        help='residual scaling')
+    # parser.add_argument('--rgb_range', type=float, default=255,
+    #                     help='residual scaling')
     args = parser.parse_args()
-
-    torch.manual_seed(2)
-
-    a = torch.rand((2, 3, 30, 30)).cuda() 
-    b = torch.rand((2, 3, 60, 60)).cuda() 
+    
+    a = torch.rand((2, 1, 30, 30)).cuda() 
+    b = torch.rand((2, 1, 60, 60)).cuda() 
 
     loss = nn.MSELoss()
     model = make_model(args).cuda()
 
-    from ptflops import get_model_complexity_info
-    flops, params = get_model_complexity_info(model, (3, 30, 30), as_strings=True, print_per_layer_stat=True)
-    print('{:<30}  {:<8}'.format('Computational complexity: ', flops))
-    print('{:<30}  {:<8}'.format('Number of parameters: ', params))
-    
-    # result = model(a)
-    # Loss = loss(result, b)
-    # Loss.backward()
+    result = model(a)
+    Loss = loss(result, b)
+    Loss.backward()
 

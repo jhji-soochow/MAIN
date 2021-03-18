@@ -1,12 +1,9 @@
 import os
 from importlib import import_module
-
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
 import numpy as np
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -16,8 +13,6 @@ class Loss(nn.modules.loss._Loss):
     def __init__(self, args, ckp):
         super(Loss, self).__init__()
         print('Preparing loss function:')
-
-        # pdb.set_trace()
         self.n_GPUs = args.n_GPUs
         self.loss = []
         self.loss_module = nn.ModuleList()
@@ -28,36 +23,11 @@ class Loss(nn.modules.loss._Loss):
                 loss_function = nn.MSELoss()
             elif loss_type == 'L1':
                 loss_function = nn.L1Loss()
-            elif loss_type.find('VGG') >= 0:
-                module = import_module('loss.vgg')
-                loss_function = getattr(module, 'VGG')(
-                    loss_type[3:],
-                    rgb_range=args.rgb_range
-                )
-            elif loss_type.find('GAN') >= 0:
-                module = import_module('loss.adversarial')
-                loss_function = getattr(module, 'Adversarial')(
-                    args,
-                    loss_type
-                )
-            elif loss_type.find('DoGLoss') >= 0: # add dogloss as an alternative loss function 
-                # only import once
-                module = import_module('loss.dog')
-                loss_function = getattr(module, 'DoGLoss')(
-                    kernel_size=5,
-                    basicloss=nn.MSELoss(),
-                    rgb_range=args.rgb_range
-                )
-            elif loss_type == 'HC': # high-frequency constraint 增加对hig部分的约束，希望分离出来的hig部分尽可能的多一点
-                loss_function = nn.MSELoss()
-                weight = -1 * weight
             self.loss.append({
                 'type': loss_type,
                 'weight': weight,
                 'function': loss_function}
             )
-            if loss_type.find('GAN') >= 0:
-                self.loss.append({'type': 'DIS', 'weight': 1, 'function': None})
 
         if len(self.loss) > 1:
             self.loss.append({'type': 'Total', 'weight': 0, 'function': None})
@@ -79,30 +49,16 @@ class Loss(nn.modules.loss._Loss):
 
         if args.load != '': self.load(ckp.dir, cpu=args.cpu)
 
-    def forward(self, sr, hr, sig=0, sr_low=0, sr_hig=0, lr=0, low_lr=0):
+    def forward(self, sr, hr):
         
         losses = []
         for i, l in enumerate(self.loss):
             if l['function'] is not None:
-                if l['type'] == 'DoGLoss':
-                    loss = l['function'](hr, sig, sr_low, sr_hig, mode='all')
-                elif l['type'] == 'DoGLoss_hig':
-                    loss = l['function'](hr, sig, sr_low, sr_hig, mode='hig')
-                elif l['type'] == 'DoGLoss_low':
-                    loss = l['function'](hr, sig, sr_low, sr_hig, mode='low')
-                elif l['type'] == 'HC':
-                    # pdb.set_trace()
-                    loss = l['function'](lr, low_lr)
-                    # l['weight'] = -1 * l['weight']
-                else:
-                    loss = l['function'](sr, hr)
-
+                loss = l['function'](sr, hr)
                 effective_loss = l['weight'] * loss
                 losses.append(effective_loss)
-                # self.log[-1, i] += effective_loss.item()
                 self.log[-1, i] += loss.item() # display all losses
-            elif l['type'] == 'DIS':
-                self.log[-1, i] += self.loss[i - 1]['function'].loss
+
 
         loss_sum = sum(losses)
         if len(self.loss) > 1:
@@ -150,21 +106,21 @@ class Loss(nn.modules.loss._Loss):
             return self.loss_module.module
 
     def save(self, apath):
-        torch.save(self.state_dict(), os.path.join(apath, 'loss.pt'))
+        # torch.save(self.state_dict(), os.path.join(apath, 'loss.pt'))
         torch.save(self.log, os.path.join(apath, 'loss_log.pt'))
 
     def load(self, apath, cpu=False):
-        if cpu:
-            kwargs = {'map_location': lambda storage, loc: storage}
-        else:
-            kwargs = {}
+        # if cpu:
+        #     kwargs = {'map_location': lambda storage, loc: storage}
+        # else:
+        #     kwargs = {}
 
-        self.load_state_dict(torch.load(
-            os.path.join(apath, 'loss.pt'),
-            **kwargs
-        ))
+        # self.load_state_dict(torch.load(
+        #     os.path.join(apath, 'loss.pt'),
+        #     **kwargs
+        # ))
         self.log = torch.load(os.path.join(apath, 'loss_log.pt'))
-        for l in self.loss_module:
-            if hasattr(l, 'scheduler'):
-                for _ in range(len(self.log)): l.scheduler.step()
+        # for l in self.loss_module:
+        #     if hasattr(l, 'scheduler'):
+        #         for _ in range(len(self.log)): l.scheduler.step()
 

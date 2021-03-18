@@ -19,7 +19,6 @@ class SRData(data.Dataset):
         self.split = 'train' if train else 'test'
         self.do_eval = True
         self.benchmark = benchmark
-        self.input_large = (args.model == 'VDSR')
         self.scale = args.scale
         self.idx_scale = 0
         
@@ -28,7 +27,9 @@ class SRData(data.Dataset):
             path_bin = os.path.join(self.apath, 'bin')
             os.makedirs(path_bin, exist_ok=True)
 
+
         list_hr, list_lr = self._scan()
+        self.count = len(list_hr)
         if args.ext.find('bin') >= 0:
             # Binary files are stored in 'bin' folder
             # If the binary file exists, load it. If not, make it.
@@ -48,16 +49,15 @@ class SRData(data.Dataset):
                     self.dir_hr.replace(self.apath, path_bin),
                     exist_ok=True
                 )
-                for s in self.scale:
-                    os.makedirs(
-                        os.path.join(
-                            self.dir_lr.replace(self.apath, path_bin),
-                            'X{}'.format(s)
-                        ),
-                        exist_ok=True
-                    )
+                os.makedirs(
+                    os.path.join(
+                        self.dir_lr.replace(self.apath, path_bin),
+                        'X{}'.format(self.scale)
+                    ),
+                    exist_ok=True
+                )
                 
-                self.images_hr, self.images_lr = [], [[] for _ in self.scale]
+                self.images_hr, self.images_lr = [], []
                 for h in list_hr:
                     b = h.replace(self.apath, path_bin)
                     b = b.replace(self.ext[0], '.pt')
@@ -66,14 +66,13 @@ class SRData(data.Dataset):
                         args.ext, [h], b, verbose=True, load=False
                     )
 
-                for i, ll in enumerate(list_lr):
-                    for l in ll:
-                        b = l.replace(self.apath, path_bin)
-                        b = b.replace(self.ext[1], '.pt')
-                        self.images_lr[i].append(b)
-                        self._check_and_load(
-                            args.ext, [l], b,  verbose=True, load=False
-                        )
+                for l in list_lr:
+                    b = l.replace(self.apath, path_bin)
+                    b = b.replace(self.ext[1], '.pt')
+                    self.images_lr.append(b)
+                    self._check_and_load(
+                        args.ext, [l], b,  verbose=True, load=False
+                    )
 
         if train:
             n_patches = args.batch_size * args.test_every
@@ -92,15 +91,10 @@ class SRData(data.Dataset):
         if self.dir_lr == None:
             names_lr = None
         else:
-            names_lr = [[] for _ in self.scale]
+            names_lr = []
             for f in names_hr:
                 filename, _ = os.path.splitext(os.path.basename(f))
-                for si, s in enumerate(self.scale):
-                    names_lr[si].append(os.path.join(
-                        self.dir_lr, 'X{}/{}x{}{}'.format(
-                            s, filename, s, self.ext[1]
-                        )
-                    ))
+                names_lr.append(os.path.join(self.dir_lr, 'X{}/{}x{}{}'.format(self.scale, filename, self.scale, self.ext[1])))
 
         return names_hr, names_lr
 
@@ -108,7 +102,6 @@ class SRData(data.Dataset):
         self.apath = os.path.join(dir_data, self.name)
         self.dir_hr = os.path.join(self.apath, 'HR')
         self.dir_lr = os.path.join(self.apath, 'LR_bicubic')
-        if self.input_large: self.dir_lr += 'L'
         self.ext = ('.png', '.png')
 
     def _name_hrbin(self):
@@ -148,6 +141,7 @@ class SRData(data.Dataset):
             return b
 
     def __getitem__(self, idx):
+        
         lr, hr, filename = self._load_file(idx)
         pair = self.get_patch(lr, hr)
         pair = common.set_channel(*pair, n_channels=self.args.n_colors)
@@ -172,7 +166,7 @@ class SRData(data.Dataset):
         if self.images_lr is None:
             f_lr = None
         else:
-            f_lr = self.images_lr[self.idx_scale][idx]
+            f_lr = self.images_lr[idx]
 
         if self.args.ext.find('bin') >= 0:
             filename = f_hr['name']
@@ -193,15 +187,15 @@ class SRData(data.Dataset):
         return lr, hr, filename
 
     def get_patch(self, lr, hr):
-        scale = self.scale[self.idx_scale]
+        scale = self.scale
+
         if lr is not None:
             if self.train:
                 lr, hr = common.get_patch(
                     lr, hr,
                     patch_size=self.args.patch_size,
                     scale=scale,
-                    multi=(len(self.scale) > 1),
-                    input_large=self.input_large
+                    multi=False,
                 )
                 if not self.args.no_augment: lr, hr = common.augment(lr, hr)
             else:
@@ -209,16 +203,7 @@ class SRData(data.Dataset):
                 hr = hr[0:ih * scale, 0:iw * scale]
 
         if self.args.direct_downsampling:
-            # directly downsample hr for producing lr
             hr = common.crop_for_scale(hr, scale)
             lr = common.directdownsample(hr, scale)
 
         return np.uint8(lr), np.uint8(hr)
-
-    def set_scale(self, idx_scale):
-        if not self.input_large:
-            self.idx_scale = idx_scale
-        else:
-            # self.idx_scale = random.randint(0, len(self.scale) - 1)
-            self.idx_scale = np.random.randint(len(self.scale) - 1)
-

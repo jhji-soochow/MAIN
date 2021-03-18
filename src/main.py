@@ -10,7 +10,7 @@ import numpy as np
 import sys
 from importlib import import_module
 
-# 设置随机种子
+# random seed
 torch.manual_seed(args.seed) # cpu
 torch.cuda.manual_seed(args.seed) #gpu
 torch.backends.cudnn.deterministic=True # cudnn
@@ -22,8 +22,8 @@ Trainer = getattr(module, 'Trainer')
 
 checkpoint = utility.checkpoint(args)
 
-if args.visdom:
-    # set visualization
+if args.visdom:  
+    # use visdom for visualization
     from visdom import Visdom
     env_name = 'SR_code_' + args.save + '_' + str(args.patch_size) + 'x' + str(args.scale[0])
     vis = Visdom(port=8097, server="http://localhost", env=env_name)
@@ -38,7 +38,7 @@ else:
     vis = None
 
 if checkpoint.ok:
-    loader = data.Data(args)
+    loader = data.Data(args) # load dataset
     model = model.Model(args, checkpoint) # call the Model function that defined in model.__init__
     loss = loss.Loss(args, checkpoint) if not args.test_only else None
     t = Trainer(args, loader, model, loss, checkpoint, logger_test, vis)

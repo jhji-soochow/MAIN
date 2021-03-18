@@ -46,8 +46,6 @@ def get_patch(*args, patch_size=96, scale=2, multi=False, input_large=False):
         tp = patch_size
         ip = patch_size
 
-    # ix = random.randrange(0, iw - ip + 1)
-    # iy = random.randrange(0, ih - ip + 1)
     ix= np.random.randint(iw - ip + 1)
     iy = np.random.randint(ih- ip + 1)
 
@@ -70,9 +68,7 @@ def set_channel(*args, n_channels=3):
 
         c = img.shape[2]
         if n_channels == 1 and c == 3:
-            # pdb.set_trace()
             img = np.expand_dims(sc.rgb2ycbcr(img)[:, :, 0], 2)
-            # 这可能是个大bug
             img = np.round(img)
         elif n_channels == 3 and c == 1:
             img = np.concatenate([img] * n_channels, 2)

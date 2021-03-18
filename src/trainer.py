@@ -28,8 +28,6 @@ class Trainer():
         self.vis = vis
 
     def train(self):
-        self.optimizer.schedule()
-        self.loss.step()
         epoch = self.optimizer.get_last_epoch()
         lr = self.optimizer.get_lr()
 
@@ -40,16 +38,14 @@ class Trainer():
         self.model.train()
 
         timer_data, timer_model = utility.timer(), utility.timer()
-        for batch, (lr, hr, _, idx_scale) in enumerate(self.loader_train):
-
-            # step = batch // self.args.test_every // 200
+        for batch, (lr, hr, _) in enumerate(self.loader_train):
             lr, hr = self.prepare(lr, hr)
             
             timer_data.hold()
             timer_model.tic()
 
             self.optimizer.zero_grad()
-            sr = self.model(lr, idx_scale)
+            sr = self.model(lr)
             loss = self.loss(sr, hr)
             loss.backward()
             if self.args.gclip > 0:
@@ -72,56 +68,74 @@ class Trainer():
         self.loss.end_log(len(self.loader_train))
         self.error_last = self.loss.log[-1, -1]
 
+        self.optimizer.schedule()
+
     def test(self):
         torch.set_grad_enabled(False)
-
         epoch = self.optimizer.get_last_epoch()
         self.ckp.write_log('\nEvaluation:')
-        self.ckp.add_log(
-            torch.zeros(1, len(self.loader_test), len(self.scale)),
-            torch.zeros(1, 3, len(self.loader_test), len(self.scale)) # max, min & avg
-        )
+
+        if self.args.test_only:# 如果只是测试的话，不需要以前的log  可以设置为0
+            self.ckp.log = torch.zeros(1, len(self.loader_test) + 1)
+        else:
+            self.ckp.add_log(torch.zeros(1, len(self.loader_test)+1)) #最后增加一维用于保存平均值
+
+        if self.args.data_test[0] == 'Demo':
+            length_list = [1] # 不算数量
+        else:
+            length_list = [loader.dataset.count for loader in self.loader_test]
         self.model.eval()
 
         timer_test = utility.timer()
         if self.args.save_results: self.ckp.begin_background()
         for idx_data, d in enumerate(self.loader_test):
-            for idx_scale, scale in enumerate(self.scale):
-                d.dataset.set_scale(idx_scale)
-                for lr, hr, filename, _ in tqdm(d, ncols=80):
-                    # pdb.set_trace()
-                    lr, hr = self.prepare(lr, hr)
-                    sr = self.model(lr, idx_scale)
-                    sr = utility.quantize(sr, self.args.rgb_range)
-                    save_list = [sr]
-                    self.ckp.log[-1, idx_data, idx_scale] += utility.calc_psnr(
-                        sr, hr, scale, self.args.rgb_range, dataset=d
-                    )
-                    if self.args.save_gt:
-                        save_list.extend([lr, hr])
-
-                    if self.args.save_results:
-                        self.ckp.save_results(d, filename[0], save_list, scale)
-
-                self.ckp.log[-1, idx_data, idx_scale] /= len(d)
-                best = self.ckp.log.max(0)
-                self.ckp.write_log(
-                    '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
-                        d.dataset.name,
-                        scale,
-                        self.ckp.log[-1, idx_data, idx_scale],
-                        best[0][idx_data, idx_scale],
-                        best[1][idx_data, idx_scale] + 1
-                    )
+            for lr, hr, filename in tqdm(d, ncols=80):
+                lr, hr = self.prepare(lr, hr)
+                sr = self.model(lr)
+                sr = utility.quantize(sr, self.args.rgb_range)
+                save_list = [sr]
+                self.ckp.log[-1, idx_data] += utility.calc_psnr(
+                    sr, hr, self.scale, self.args.rgb_range, dataset=d
                 )
+                if self.args.save_gt:
+                    save_list.extend([lr, hr])
 
-        # write visdom
+                if self.args.save_results:
+                    self.ckp.save_results(d, filename[0], save_list, self.scale)
+
+            self.ckp.log[-1, idx_data] /= len(d)
+            best = self.ckp.log.max(0)
+            self.ckp.write_log(
+                '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
+                    d.dataset.name,
+                    self.scale,
+                    self.ckp.log[-1, idx_data],
+                    best[0][idx_data],
+                    best[1][idx_data]
+                )
+            )
+
+        # 计算这一轮的平局值
+        self.ckp.log[-1, -1] =  sum(self.ckp.log[-1,0:-1] * torch.tensor(length_list).float()) / sum(length_list)
+        best = self.ckp.log.max(0)
+        
+        self.ckp.write_log(
+            '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
+                'Average',
+                self.scale,
+                self.ckp.log[-1, -1], # 最后一个记录的最后一个数据
+                best[0][-1],
+                best[1][-1]
+            )
+        )
+
+        # For visdom
         if self.logger_test:
-            Y = self.ckp.log[:,:,0]
+            Y = self.ckp.log
             X = torch.arange(0, len(Y))
-            self.vis.line(X=X, Y=Y, win=self.logger_test, opts=dict(
-                legend=[d.dataset.name for idx_data, d in enumerate(self.loader_test) ], title="PSNR"))
-
+            legends = [d.dataset.name for idx_data, d in enumerate(self.loader_test) ]
+            legends.append('Average')
+            self.vis.line(X=X, Y=Y, win=self.logger_test, opts=dict(legend=legends, title="PSNR"))
 
         self.ckp.write_log('Forward: {:.2f}s\n'.format(timer_test.toc()))
         self.ckp.write_log('Saving...')
@@ -130,7 +144,7 @@ class Trainer():
             self.ckp.end_background()
 
         if not self.args.test_only:
-            self.ckp.save(self, epoch, is_best=(best[1][0, 0] + 1 == epoch))
+            self.ckp.save(self, epoch, is_best=(best[1][-1] + 1 == epoch))
 
         self.ckp.write_log(
             'Total: {:.2f}s\n'.format(timer_test.toc()), refresh=True
@@ -151,6 +165,6 @@ class Trainer():
             self.test()
             return True
         else:
-            epoch = self.optimizer.get_last_epoch() + 1
+            epoch = self.optimizer.get_last_epoch()
             return epoch >= self.args.epochs
 

@@ -47,7 +47,6 @@ class checkpoint():
         self.args = args
         self.ok = True
         self.log = torch.Tensor()
-        self.sigma_log = torch.Tensor() # 增加log记录
         now = datetime.datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
 
         if not args.load:
@@ -58,7 +57,6 @@ class checkpoint():
             self.dir = os.path.join('..', 'experiment', args.load)
             if os.path.exists(self.dir):
                 self.log = torch.load(self.get_path('psnr_log.pt'))
-                self.sigma_log = torch.load(self.get_path('sigma_log.pt')) # 加载sigma_log
                 print('Continue from epoch {}...'.format(len(self.log)))
             else:
                 args.load = ''
@@ -93,7 +91,6 @@ class checkpoint():
         self.plot_psnr(epoch)
         trainer.optimizer.save(self.dir)
         torch.save(self.log, self.get_path('psnr_log.pt'))
-        torch.save(self.sigma_log, self.get_path('sigma_log.pt')) # 保存sigma
 
     def add_log(self, log, sigma_log=None):
         self.log = torch.cat([self.log, log])
@@ -117,29 +114,17 @@ class checkpoint():
             label = 'SR on {}'.format(d)
             fig = plt.figure()
             plt.title(label)
-            for idx_scale, scale in enumerate(self.args.scale):
-                plt.plot(
-                    axis,
-                    self.log[:, idx_data, idx_scale].numpy(),
-                    label='Scale {}'.format(scale)
-                )
+            plt.plot(
+                axis,
+                self.log[:, idx_data].numpy(),
+                label='Scale {}'.format(self.args.scale)
+            )
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')
             plt.grid(True)
             plt.savefig(self.get_path('test_{}.pdf'.format(d)))
             plt.close(fig)
-    
-    def process_sigma(self, sigma):
-        # pdb.set_trace()
-        sigma_group = torch.zeros(3)
-        sigma_group[0] = torch.from_numpy(np.array(np.max(sigma)))
-        sigma_group[1] = torch.from_numpy(np.array(np.min(sigma)))
-        sigma_group[2] = torch.from_numpy(np.array(np.mean(sigma)))
-        return sigma_group
-
-    def plot_sigma(self, epoch):
-        pass
     
     def logstovisdom(self):
         return self.log
@@ -241,26 +226,25 @@ def make_optimizer(args, target, alias='optimizer'): # give this optimizer a nam
             self.scheduler = scheduler_class(self, **kwargs)
 
         def save(self, save_dir):
-            torch.save(self.state_dict(), self.get_dir(save_dir))
+            torch.save(self.state_dict(), self.get_dir(save_dir, 'self'))
+            torch.save(self.scheduler.state_dict(), self.get_dir(save_dir, 'scheduler'))
 
         def load(self, load_dir, epoch=1):
-            self.load_state_dict(torch.load(self.get_dir(load_dir)))
-            if epoch > 1:
-                for _ in range(epoch): self.scheduler.step()
+            self.load_state_dict(torch.load(self.get_dir(load_dir, 'self')))
+            self.scheduler.load_state_dict(torch.load(self.get_dir(load_dir, 'scheduler')))
 
-        def get_dir(self, dir_path):
-            return os.path.join(dir_path, '{}.pt'.format(self.alias))
+        def get_dir(self, dir_path, name):
+            return os.path.join(dir_path, '{}_{}.pt'.format(self.alias, name))
 
         def schedule(self):
             self.scheduler.step()
 
         def get_lr(self):
-            return self.scheduler.get_lr()[0]
+            return self.scheduler.get_last_lr()[0]
 
         def get_last_epoch(self):
             return self.scheduler.last_epoch
-
+    
     optimizer = CustomOptimizer(alias,trainable, **kwargs_optimizer)
     optimizer._register_scheduler(scheduler_class, **kwargs_scheduler)
     return optimizer
-

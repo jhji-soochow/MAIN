@@ -3,8 +3,6 @@ import template
 
 parser = argparse.ArgumentParser(description='MAIN')
 
-parser.add_argument('--debug', action='store_true',
-                    help='Enables debug mode')
 parser.add_argument('--trainer', default='trainer',
                     help='trainer')                    
 parser.add_argument('--template', default='.',
@@ -33,8 +31,8 @@ parser.add_argument('--data_range', type=str, default='1-100/801-810',
                     help='train/test data range')
 parser.add_argument('--ext', type=str, default='sep',
                     help='dataset file extension')
-parser.add_argument('--scale', type=str, default='2',
-                    help='super resolution scale')
+parser.add_argument('--scale', type=int, default=2,
+                    help='upscale factor')
 parser.add_argument('--direct_downsampling', action='store_true',
                     help='get LR image by direct downsampling')
 
@@ -48,8 +46,6 @@ parser.add_argument('--rgb_range', type=int, default=255,
                     help='maximum value of RGB')
 parser.add_argument('--n_colors', type=int, default=1,
                     help='number of color channels to use')
-parser.add_argument('--chop', action='store_true',
-                    help='enable memory-efficient forward')
 parser.add_argument('--no_augment', action='store_true',
                     help='do not use data augmentation')
 
@@ -63,25 +59,15 @@ parser.add_argument('--pre_train', type=str, default='',
                     help='pre-trained model directory')
 parser.add_argument('--extend', type=str, default='.',
                     help='pre-trained model directory')
-parser.add_argument('--n_resblocks', type=int, default=7,
-                    help='number of residual blocks')
-parser.add_argument('--n_feats', type=int, default=64,
-                    help='number of feature maps')
-parser.add_argument('--res_scale', type=float, default=1,
-                    help='residual scaling')
-parser.add_argument('--shift_mean', default=True,
-                    help='subtract pixel mean from the input')
-parser.add_argument('--dilation', action='store_true',
-                    help='use dilated convolution')
+# parser.add_argument('--res_scale', type=float, default=1,
+#                     help='residual scaling')
+# parser.add_argument('--shift_mean', default=True,
+#                     help='subtract pixel mean from the input')
+# parser.add_argument('--dilation', action='store_true',
+#                     help='use dilated convolution')
 parser.add_argument('--precision', type=str, default='single',
                     choices=('single', 'half'),
                     help='FP precision for test (single | half)')
-
-# Option for Residual channel attention network (RCAN)
-parser.add_argument('--n_resgroups', type=int, default=10,
-                    help='number of residual groups')
-parser.add_argument('--reduction', type=int, default=16,
-                    help='number of feature maps reduction')
 
 # Training specifications
 parser.add_argument('--reset', action='store_true',
@@ -92,14 +78,14 @@ parser.add_argument('--epochs', type=int, default=300,
                     help='number of epochs to train')
 parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')
-parser.add_argument('--split_batch', type=int, default=1,
-                    help='split the batch into smaller chunks')
-parser.add_argument('--self_ensemble', action='store_true',
-                    help='use self-ensemble method for test')
+# parser.add_argument('--split_batch', type=int, default=1,
+#                     help='split the batch into smaller chunks')
+# parser.add_argument('--self_ensemble', action='store_true',
+#                     help='use self-ensemble method for test')
 parser.add_argument('--test_only', action='store_true',
                     help='set this option to test the model')
-parser.add_argument('--gan_k', type=int, default=1,
-                    help='k value for adversarial loss')
+# parser.add_argument('--gan_k', type=int, default=1,
+#                     help='k value for adversarial loss')
 
 # Optimization specifications
 parser.add_argument('--lr', type=float, default=1e-4,
@@ -148,14 +134,12 @@ parser.add_argument('--save_gt', action='store_true',
 parser.add_argument('--visdom', action='store_true',
                     help='show log with visdom')
 parser.add_argument('--onlydraw', action='store_true',
-                    help='only show training lines in visdom and then exit the program')
+                    help='only show training PSNRs in visdom and then exit the program')
 
 
 args = parser.parse_args()
-
 template.set_template(args)
 
-args.scale = list(map(lambda x: int(x), args.scale.split('+')))
 args.data_train = args.data_train.split('+')
 args.data_test = args.data_test.split('+')
 
