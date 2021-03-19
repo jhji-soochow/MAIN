@@ -4,6 +4,7 @@ import utility
 import data
 import model
 import loss
+import skimage
 from option import args
 
 import numpy as np
@@ -25,7 +26,7 @@ checkpoint = utility.checkpoint(args)
 if args.visdom:  
     # use visdom for visualization
     from visdom import Visdom
-    env_name = 'SR_code_' + args.save + '_' + str(args.patch_size) + 'x' + str(args.scale[0])
+    env_name = 'SR_code_' + args.save + '_' + str(args.patch_size) + 'x' + str(args.scale)
     vis = Visdom(port=8097, server="http://localhost", env=env_name)
     if len(checkpoint.log) > 0:
         logger_test =vis.line(X=torch.arange(0, len(checkpoint.log)), Y=checkpoint.log[:,:, 0], opts=dict(title="PSNR"))
