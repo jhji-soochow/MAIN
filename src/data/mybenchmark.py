@@ -17,7 +17,8 @@ class Benchmark(srdata.SRData):
 
     def _set_filesystem(self, dir_data):
         # path of your benchmark dir
-        dir_data = '/data/jjh_backup/1_3/testset'
+        # dir_data = '/data/jjh_backup/1_3/testset'
+        dir_data = os.path.join(dir_data, 'myBenchmark')
         self.apath = os.path.join(dir_data, self.name[2:])
         self.dir_hr = os.path.join(self.apath)
         self.dir_lr = None
