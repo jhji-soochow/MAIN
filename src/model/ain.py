@@ -110,7 +110,7 @@ class AIN(nn.Module):
         super(AIN, self).__init__()
         
         n_feats = 64
-        n_blocks = 2
+        n_blocks = 7
         kernel_size = 3
         scale = args.scale
         act = nn.ReLU(True)
