@@ -2,7 +2,7 @@
 
 ![](/figs/network.png)
 
-This repository is an PyTorch implementation of the paper **"Multi-scale Attention-aware Inception Network for Image Interpolation"** from **Tranactions on Image Processing (TIP)**.
+This repository is a PyTorch implementation of the paper **"Multi-scale Attention-aware Inception Network for Image Interpolation"** from **Transactions on Image Processing (TIP)**.
 
 **Note:** This is a re-implemented version for readers to train and test our code. For only conducting a comparison with our results in the MAIN paper.  You can download some results from [here](https://drive.google.com/drive/u/0/folders/1yO2dyG3sbnCAbSF787Os-6TtlMlc2jzj), including the *ground-truth images*, our *produced results*, and the *exploited evluation methods* (in Matlab).  
 
