@@ -21,7 +21,7 @@ The Dependencies are listed as follows:
 
 To use our code, please clone this repository into your device and then change the directory to ``MAIN`` by using the following two commands:
 ```bash
-git clone https://github.com/thstkdgus35/EDSR-PyTorch
+git clone https://github.com/jhji-soochow/MAIN.git
 cd MAIN
 ```
 ### How to train?
