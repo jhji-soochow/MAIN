@@ -10,8 +10,13 @@
 .vscode
 */.DS_Store
 
+# Dirs
 dataset
-experiment
 test
 
 *.pyc
+
+#
+run_MAINnet.py
+run_MAINnet.sh
+

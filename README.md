@@ -6,7 +6,8 @@ This repository is an PyTorch implementation of the paper **"Multi-scale Attenti
 
 **Note:** This is a re-implemented version for readers to train and test our code. For only conducting a comparison with our results in the MAIN paper.  You can download some results from [here](https://drive.google.com/drive/u/0/folders/1yO2dyG3sbnCAbSF787Os-6TtlMlc2jzj), including the *ground-truth images*, our *produced results*, and the *exploited evluation methods* (in Matlab).  
 
-In this repository, you can train your own model from scratch, and test the trained on the provided ground-truth images. Or, you can download our pre-trained model and use it to enlarge your images.
+In this repository, you can train your own model from scratch, and test the trained model on the provided ground-truth images. 
+Or, you can download our pre-trained model and use it to interpolate your images. [coming soon]
 
 The Dependencies are listed as follows:
 * Python 3.6
@@ -44,7 +45,8 @@ We also provide the command of "--visdom" to monitor your model's performance on
 
 
 TODO: 
-We will upload some pretrained models, so the readers can directly interpolate their testing images with our code.  
+We will upload some pretrained models and inference code of MAIN.
+
 <!-- #### How to interpolate your test images with our published pretrained models.
 
 You can test our MAIN method with your own images. Place your images into any place ( our default folder is ``test``). 
