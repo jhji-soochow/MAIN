@@ -30,7 +30,21 @@ The [DIV2K](http://www.vision.ee.ethz.ch/%7Etimofter/publications/Agustsson-CVPR
 
 Some of our codes are borrowed form the of the repository of [EDSR](https://github.com/thstkdgus35/EDSR-PyTorch). According to EDSR, it is recommend to pre-process the images before training. This step will decode all **png** files and save them as binaries. Use ``--ext sep_reset`` argument on your first run. You can skip the decoding part and use saved binaries with ``--ext sep`` argument.
 
-Once the dataset are ready, you can train our ***attention-aware inception network*** (AIN) by yourself. For your convenience, we provide a training script for network training. You can run the script by: 
+For the test datasets, download the ``GT_images`` from [here](https://drive.google.com/drive/u/0/folders/1yO2dyG3sbnCAbSF787Os-6TtlMlc2jzj) and unpack them to "/dataset/myBenchmark". Your benchmark dataset should be:
+```
+cd dataset/myBenchmark
+tree -L 1
+.
+├── BSDS100
+├── Manga109
+├── Set15
+├── Set18
+├── Set5
+├── Urban100
+└── Urban12
+```
+
+Once the datasets are ready, you can train our ***attention-aware inception network*** (AIN) by yourself. For your convenience, we provide a training script for network training. You can run the script by: 
 
 ```bash
 cd src       # You are now in */MAIN/src
